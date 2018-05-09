@@ -333,6 +333,68 @@ namespace aheuIDA.Tests
             AssertAheui("54320543205432054320", code);
         }
 
+        [TestMethod, TestCategory("Bahmanghui")]
+        public void TestBahmanghui()
+        {
+            AssertAheui("48175", "밯망희", '밯');
+        }
+
+        [TestMethod, TestCategory("Literary")]
+        public void TestHaut()
+        {
+            var code = @"삶은밥과야근밥샤주세양♡밥사밥사밥사밥사밥사땅땅땅빵☆따밦내발따밦다빵맣밥밥밥내놔밥줘밥밥밥밗땅땅땅박밝땅땅딻타밟타맣밦밣따박타맣밦밣따박타맣밦밣따박타맣박빵빵빵빵따따따따맣희";
+            AssertAheui("하읏... ", code);
+        }
+
+        [TestMethod, TestCategory("Literary")]
+        public void TestHuntCook()
+        {
+            var code = @"받밤발박바밠발박밤바받박바발밦박박밤박박밤발발밤박밠밦밦밦밣바밣밡발박밤발발붐
+　밠밦밠박박받발밡발밤발밡박밤바밤박받받박발밠박발발받밠밤밤바밤박받받박발붌박
+　밣박박박밤박박박밤박받바받발밦밡발받밤발박바밠발박밤바받박바발밦받바받불발바
+　박박밤박밤발밡박받바받밠받밣발박발발받밠밤받바받밠받밣발발바밣박박박붐밦밡발
+　받받밡발발밤발발받발밦밦밤밤밠박밤밤밠박바밤밤밠박밤밤밠박밣박밣박붏박밦밦밦
+　받받밡발박밦발받바밦밠밦박박밤박박박밤박받밤발박바밠발밦받밣박밠불밡발밠밤밠
+　밠박밣박밠박밣박밠박밣박밠박밣박발바밣박박밤바받박바발밦박박밤북밣박밤발밡박
+　밠받밣발박발발받밠밤받바받밠받밣발발바밣박박박밤박밠바밡박밦붒밤발밡박받바받
+　받밤밡발밠밦박밦받밡발밠밠바밣받밡발밤밤밠박밤밤밠박밤밤밠북밦받받밡발밦밣밠
+요번에  아희   잡았다고?　밠뱍벰밷벰배벡배벬뱀벰밷벰백벼밠밦박밦바밤밦밦밠밦밠밦밦발밤밡발
+(・ω・)
+⊃밯망희⊂
+
+신선한  stdin  넣고
+(・ω・)　빠바푸맣밯뿌
+三⊃⊂三따타초　자추뱍벌
+무밯빠발복　아　　마
+(＾ω＾)맛나구나
+⊃⊂　　　산빠싿숟산빠쑫
+빠추싹쑨숙썯서터따도떠섣맣샤희
+오반또삭뺘묘차복　산싿삳노";
+            var output = @"요번에  오리고기   잡았다고?
+(・ω・)
+⊃(::::)=3⊂
+
+신선한  대파  넣고
+(・ω・)
+三⊃⊂三
+
+(＾ω＾)맛나구나
+⊃⊂";
+            AssertAheui(output, code, "오리고기\n대파");
+        }
+
+        [TestMethod, TestCategory("Literary")]
+        public void TestPokryong()
+        {
+            var code = @"육체는　단명하고
+근성은　영원한것
+방산반밧나뿌서어뎐근성
+대류…분선창사반나산분
+폭룡이탄뭉폭룡의뇨시볏
+최고다아하＃김끼룩제작";
+            AssertAheui("10", code, 1024);
+        }
+
         private void AssertAheui(string expected, string code, params int[] args)
         {
             var exit = IntAheui.Execute(code, out var output, args);
