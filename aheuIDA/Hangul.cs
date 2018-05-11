@@ -11,10 +11,15 @@
         public char Jungseong { get; }
         public char Jongseong { get; }
 
+        public bool IsInvalid { get; } = false;
+
         public Hangul(char letter)
         {
             Letter = letter;
-            (Choseong, Jungseong, Jongseong) = SeparateLetter(letter);
+            if (IsKorean(letter))
+                (Choseong, Jungseong, Jongseong) = SeparateLetter(letter);
+            else
+                IsInvalid = true;
         }
 
         public Hangul(char choseong, char jungseong, char jongseong)
@@ -33,10 +38,13 @@
             return (char)('가' + (a * 21 + b) * 28 + c);
         }
 
+        private static bool IsKorean(char letter)
+            => '가' <= letter && letter <= '힇';
+
         private static (char cho, char jung, char jong) SeparateLetter(char letter)
         {
             int a, b, c;
-            if ('가' <= letter && letter <= '힇')
+            if (IsKorean(letter))
             {
                 c = letter - '가';
                 a = c / (21 * 28);
