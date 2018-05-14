@@ -14,7 +14,7 @@ namespace aheuIDA
         private StorageTFromInt<T> _inttot;
 
         private readonly Dictionary<char, Stack<T>> _stacks;
-        private Queue<T> _queue;
+        private List<T> _queue;
 
         public Storage(
             StorageFunction<T> add,
@@ -65,7 +65,7 @@ namespace aheuIDA
                 { 'ㅆ', new Stack<T>() },
                 { 'ㅎ', new Stack<T>() }
             };
-            _queue = new Queue<T>();
+            _queue = new List<T>();
         }
 
         public char CurrentStorage { get; private set; } = ' ';
@@ -90,7 +90,11 @@ namespace aheuIDA
         public T Pop()
         {
             if (CurrentStorage == 'ㅇ')
-                return _queue.Dequeue();
+            {
+                var res = _queue[0];
+                _queue.RemoveAt(0);
+                return res;
+            }
             else
                 return CurrentStack.Pop();
         }
@@ -112,7 +116,7 @@ namespace aheuIDA
         public void Push(T value)
         {
             if (CurrentStorage == 'ㅇ')
-                _queue.Enqueue(value);
+                _queue.Add(value);
             else
                 CurrentStack.Push(value);
         }
@@ -136,9 +140,16 @@ namespace aheuIDA
         {
             if (!CanPop(1))
                 return false;
-            var pop = Pop();
-            Push(pop);
-            Push(pop);
+            if (CurrentStorage == 'ㅇ')
+            {
+                _queue.Insert(0, _queue[0]);
+            }
+            else
+            {
+                var pop = Pop();
+                Push(pop);
+                Push(pop);
+            }
             return true;
         }
 
@@ -146,10 +157,19 @@ namespace aheuIDA
         {
             if (!CanPop(2))
                 return false;
-            var first = Pop();
-            var last = Pop();
-            Push(first);
-            Push(last);
+            if (CurrentStorage == 'ㅇ')
+            {
+                var temp = _queue[0];
+                _queue[0] = _queue[1];
+                _queue[1] = temp;
+            }
+            else
+            {
+                var first = Pop();
+                var last = Pop();
+                Push(first);
+                Push(last);
+            }
             return true;
         }
 

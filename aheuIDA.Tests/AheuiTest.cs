@@ -158,6 +158,8 @@ namespace aheuIDA.Tests
         [TestMethod, TestCategory("Standard")]
         public void TestPieup()
         {
+            var code_short = @"상밟밟밝밝땅땅바팡망망희";
+            AssertAheui("4981", code_short);
             var code = @"바밟밟땅밝밝땅팡망망우
 숭ㅇㅇㅇㅇㅇㅇㅇㅇㅇ어
 밟밟밝밝땅땅바팡망망희";
@@ -170,6 +172,13 @@ namespace aheuIDA.Tests
             var code = @"밞밞반다따반타뭉
 ㅇㅇㅇㅇㅇㅇㅇ밞밞반다따반타맣희";
             AssertAheui("97a", code);
+        }
+
+        [TestMethod, TestCategory("Standard")]
+        public void TestSimpleQueue()
+        {
+            var code = @"상박받타망희";
+            AssertAheui("1", code);
         }
 
         [TestMethod, TestCategory("Standard")]
