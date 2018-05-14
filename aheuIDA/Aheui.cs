@@ -12,10 +12,12 @@ namespace aheuIDA
     /// <param name="isNumeric">Is input is numeric type or char type</param>
     /// <returns>Input</returns>
     public delegate T AheuiInputDelegate<T>(bool isNumeric);
+    public delegate void AheuiOutputDelegate<T>(T value, bool isNumeric);
     public abstract class Aheui<T>
     {
         public bool DebugEnabled { get; set; }
         public event AheuiInputDelegate<T> NeedInput;
+        public event AheuiOutputDelegate<T> NeedOutput;
 
         public bool IsExited { get; private set; }
         public int ExitCode { get; private set; }
@@ -25,12 +27,16 @@ namespace aheuIDA
         public int Width { get; }
         public int Height { get; }
 
+        private readonly Storage<T> _storage;
         private Cursor _cursor;
+
+        public Hangul CurrentCode => _code[_cursor.Y, _cursor.X];
         
         public Aheui(string code)
         {
             OriginalCode = code;
             _code = SeparateCode(code);
+            _storage = new Storage<T>(Add, Sub, Mul, Div, Mod, IsEqual, IsBiggerOrEqual, IntToT);
             _cursor = new Cursor();
         }
 
@@ -50,6 +56,141 @@ namespace aheuIDA
             }
             return board;
         }
+
+        public void RunAll()
+        {
+            while (!IsExited)
+                Step();
+        }
+
+        public void Step()
+        {
+            var next = GetNextCursor();
+
+            bool? reversed = null;
+            switch (CurrentCode.Choseong)
+            {
+                case 'ㅎ':
+                    IsExited = true;
+                    break;
+                // ㄷ 묶음
+                case 'ㄷ':
+                    reversed = _storage.Add();
+                    break;
+                case 'ㄸ':
+                    reversed = _storage.Mul();
+                    break;
+                case 'ㅌ':
+                    reversed = _storage.Sub();
+                    break;
+                case 'ㄴ':
+                    reversed = _storage.Div();
+                    break;
+                case 'ㄹ':
+                    reversed = _storage.Mod();
+                    break;
+                // ㅂ 묶음
+                case 'ㅂ':
+                    T value;
+                    if (CurrentCode.Jongseong == 'ㅇ')
+                        value = NeedInput(true);
+                    else if (CurrentCode.Jongseong == 'ㅎ')
+                        value = NeedInput(false);
+                    else
+                        value = IntToT(Hangul.GetStrokeCount(CurrentCode.Jongseong));
+                    break;
+                case 'ㅁ':
+                    if (_storage.TryPop(out T popped))
+                    {
+                        if (CurrentCode.Jongseong == 'ㅇ')
+                            NeedOutput(popped, true);
+                        else if (CurrentCode.Jongseong == 'ㅎ')
+                            NeedOutput(popped, false);
+                    }
+                    else
+                        next.Reverse();
+                    break;
+                case 'ㅃ':
+                    reversed = _storage.Duplicate();
+                    break;
+                case 'ㅍ':
+                    reversed = _storage.Swap();
+                    break;
+                // ㅅ 묶음
+                case 'ㅅ':
+                    _storage.Select(CurrentCode.Jongseong);
+                    break;
+                case 'ㅆ':
+                    reversed = _storage.Move(CurrentCode.Jongseong);
+                    break;
+                case 'ㅈ':
+                    reversed = _storage.Compare();
+                    break;
+                case 'ㅊ':
+                    reversed = _storage.Conditional();
+                    break;
+            }
+            if (reversed == false)
+                next.Reverse();
+
+            _cursor = next;
+        }
+
+        private Cursor GetNextCursor()
+        {
+            if (CurrentCode.IsInvalid)
+                return _cursor.GetSteppedCursor();
+            else
+            {
+                var next = new Cursor(_cursor);
+                switch(CurrentCode.Jungseong)
+                {
+                    case 'ㅏ':
+                        next.Right(1);
+                        break;
+                    case 'ㅑ':
+                        next.Right(2);
+                        break;
+                    case 'ㅓ':
+                        next.Left(1);
+                        break;
+                    case 'ㅕ':
+                        next.Left(2);
+                        break;
+                    case 'ㅗ':
+                        next.Up(1);
+                        break;
+                    case 'ㅛ':
+                        next.Up(2);
+                        break;
+                    case 'ㅜ':
+                        next.Down(1);
+                        break;
+                    case 'ㅠ':
+                        next.Down(2);
+                        break;
+                    case 'ㅡ':
+                        next.ReverseY();
+                        break;
+                    case 'ㅣ':
+                        next.ReverseX();
+                        break;
+                    case 'ㅢ':
+                        next.Reverse();
+                        break;
+                }
+                return next;
+            }
+        }
+
+        protected abstract T Add(in T a, in T b);
+        protected abstract T Sub(in T a, in T b);
+        protected abstract T Mul(in T a, in T b);
+        protected abstract T Div(in T a, in T b);
+        protected abstract T Mod(in T a, in T b);
+        protected abstract bool IsEqual(in T a, in T b);
+        protected abstract bool IsBiggerOrEqual(in T a, in T b);
+        protected abstract T IntToT(in int val);
     }
 
     public class IntAheui : Aheui<int>
@@ -68,7 +209,44 @@ namespace aheuIDA
         /// <returns>Exit code</returns>
         public static int Execute(string code, out string output, params int[] args)
         {
-            throw new NotImplementedException();
+            var res = new StringBuilder();
+            var queue = new Queue<int>(args);
+            var aheui = new IntAheui(code);
+            aheui.NeedInput += (num) => queue.Dequeue();
+            aheui.NeedOutput += (val, num) =>
+            {
+                if (num)
+                    res.Append(val);
+                else
+                    res.Append((char)val);
+            };
+            aheui.RunAll();
+            output = res.ToString();
+            return aheui.ExitCode;
         }
+
+        protected override int Add(in int a, in int b)
+            => a + b;
+
+        protected override int Sub(in int a, in int b)
+            => a - b;
+
+        protected override int Mul(in int a, in int b)
+            => a * b;
+
+        protected override int Div(in int a, in int b)
+            => a / b;
+
+        protected override int Mod(in int a, in int b)
+            => a % b;
+
+        protected override bool IsEqual(in int a, in int b)
+            => a == b;
+
+        protected override bool IsBiggerOrEqual(in int a, in int b)
+            => a <= b;
+
+        protected override int IntToT(in int val)
+            => val;
     }
 }

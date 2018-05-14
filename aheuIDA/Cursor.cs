@@ -1,10 +1,37 @@
 ﻿namespace aheuIDA
 {
-    public class Cursor
+    public sealed class Cursor
     {
         public readonly int Width, Height;
-        public int X, Y;
-        public int XSpeed, YSpeed;
+        private int _x, _y;
+        public int X
+        {
+            get => _x;
+            private set
+            {
+                if (value < 0)
+                    _x = Width - 1;
+                else if (value >= Width)
+                    _x = 0;
+                else
+                    _x = value;
+            }
+        }
+        public int Y
+        {
+            get => _y;
+            private set
+            {
+                if (value < 0)
+                    _y = Height - 1;
+                else if (value >= Height)
+                    _y = 0;
+                else
+                    _y = value;
+            }
+        }
+        public int XSpeed { get; private set; }
+        public int YSpeed { get; private set; }
 
         public Cursor()
         {
@@ -37,5 +64,24 @@
 
         public void Reverse()
             => (XSpeed, YSpeed) = (-XSpeed, -YSpeed);
+
+        public void ReverseX()
+            => XSpeed = -XSpeed;
+
+        public void ReverseY()
+            => YSpeed = -YSpeed;
+
+        public void Step()
+        {
+            X += XSpeed;
+            Y += YSpeed;
+        }
+
+        public Cursor GetSteppedCursor()
+        {
+            var next = new Cursor(this);
+            next.Step();
+            return next;
+        }
     }
 }
