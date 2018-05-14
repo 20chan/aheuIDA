@@ -35,23 +35,28 @@ namespace aheuIDA
         public Aheui(string code)
         {
             OriginalCode = code;
-            _code = SeparateCode(code);
+            _code = SeparateCode(code, out var width, out var height);
+            Width = width;
+            Height = height;
             _storage = new Storage<T>(Add, Sub, Mul, Div, Mod, IsEqual, IsBiggerOrEqual, IntToT);
-            _cursor = new Cursor();
+            _cursor = new Cursor(Width, Height);
         }
 
-        private static Hangul[,] SeparateCode(string code)
+        private static Hangul[,] SeparateCode(string code, out int width, out int height)
         {
             var lines = code.Replace("\r\n", "\n").Split('\n');
-            int height = lines.Length;
-            int width = lines.Max(s => s.Length);
+            height = lines.Length;
+            width = lines.Max(s => s.Length);
 
             var board = new Hangul[height, width];
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    board[i, j] = new Hangul(lines[i][j]);
+                    if (lines[i].Length > j)
+                        board[i, j] = new Hangul(lines[i][j]);
+                    else
+                        board[i, j] = new Hangul(' ');
                 }
             }
             return board;
@@ -67,27 +72,31 @@ namespace aheuIDA
         {
             var next = GetNextCursor();
 
-            bool? reversed = null;
+            bool? straight = null;
             switch (CurrentCode.Choseong)
             {
                 case 'ㅎ':
                     IsExited = true;
+                    if (_storage.CanPop(1))
+                    {
+                        ExitCode = TToInt(_storage.Pop());
+                    }
                     break;
                 // ㄷ 묶음
                 case 'ㄷ':
-                    reversed = _storage.Add();
+                    straight = _storage.Add();
                     break;
                 case 'ㄸ':
-                    reversed = _storage.Mul();
+                    straight = _storage.Mul();
                     break;
                 case 'ㅌ':
-                    reversed = _storage.Sub();
+                    straight = _storage.Sub();
                     break;
                 case 'ㄴ':
-                    reversed = _storage.Div();
+                    straight = _storage.Div();
                     break;
                 case 'ㄹ':
-                    reversed = _storage.Mod();
+                    straight = _storage.Mod();
                     break;
                 // ㅂ 묶음
                 case 'ㅂ':
@@ -98,6 +107,7 @@ namespace aheuIDA
                         value = NeedInput(false);
                     else
                         value = IntToT(Hangul.GetStrokeCount(CurrentCode.Jongseong));
+                    _storage.Push(value);
                     break;
                 case 'ㅁ':
                     if (_storage.TryPop(out T popped))
@@ -108,31 +118,32 @@ namespace aheuIDA
                             NeedOutput(popped, false);
                     }
                     else
-                        next.Reverse();
+                        straight = false;
                     break;
                 case 'ㅃ':
-                    reversed = _storage.Duplicate();
+                    straight = _storage.Duplicate();
                     break;
                 case 'ㅍ':
-                    reversed = _storage.Swap();
+                    straight = _storage.Swap();
                     break;
                 // ㅅ 묶음
                 case 'ㅅ':
                     _storage.Select(CurrentCode.Jongseong);
                     break;
                 case 'ㅆ':
-                    reversed = _storage.Move(CurrentCode.Jongseong);
+                    straight = _storage.Move(CurrentCode.Jongseong);
                     break;
                 case 'ㅈ':
-                    reversed = _storage.Compare();
+                    straight = _storage.Compare();
                     break;
                 case 'ㅊ':
-                    reversed = _storage.Conditional();
+                    straight = _storage.Conditional();
                     break;
             }
-            if (reversed == false)
+            if (straight == false)
                 next.Reverse();
 
+            next.Step();
             _cursor = next;
         }
 
@@ -191,6 +202,7 @@ namespace aheuIDA
         protected abstract bool IsEqual(in T a, in T b);
         protected abstract bool IsBiggerOrEqual(in T a, in T b);
         protected abstract T IntToT(in int val);
+        protected abstract int TToInt(in T val);
     }
 
     public class IntAheui : Aheui<int>
@@ -247,6 +259,9 @@ namespace aheuIDA
             => a <= b;
 
         protected override int IntToT(in int val)
+            => val;
+
+        protected override int TToInt(in int val)
             => val;
     }
 }

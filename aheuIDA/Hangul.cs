@@ -1,5 +1,6 @@
 ﻿namespace aheuIDA
 {
+    [System.Diagnostics.DebuggerDisplay("{Letter}")]
     public sealed class Hangul
     {
         private const string Choseongs = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";

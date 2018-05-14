@@ -37,6 +37,7 @@ namespace aheuIDA
 
             _stacks = new Dictionary<char, Stack<T>>(28)
             {
+                { ' ', new Stack<T>() },
                 { 'ㄱ', new Stack<T>() },
                 { 'ㄴ', new Stack<T>() },
                 { 'ㄷ', new Stack<T>() },
@@ -67,7 +68,7 @@ namespace aheuIDA
             _queue = new Queue<T>();
         }
 
-        public char CurrentStorage { get; private set; }
+        public char CurrentStorage { get; private set; } = ' ';
 
         private Stack<T> CurrentStack => _stacks[CurrentStorage];
         private IReadOnlyCollection<T> CurrentCollection
@@ -143,7 +144,7 @@ namespace aheuIDA
 
         public bool Swap()
         {
-            if (!CanPop(1))
+            if (!CanPop(2))
                 return false;
             var first = Pop();
             var last = Pop();
@@ -194,7 +195,7 @@ namespace aheuIDA
 
             var first = Pop();
             var last = Pop();
-            Push(func(first, last));
+            Push(func(last, first));
             return true;
         }
     }

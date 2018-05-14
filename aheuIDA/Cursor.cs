@@ -33,11 +33,13 @@
         public int XSpeed { get; private set; }
         public int YSpeed { get; private set; }
 
-        public Cursor()
+        public Cursor(int width, int height)
         {
             X = Y = 0;
-            XSpeed = 1;
-            YSpeed = 0;
+            XSpeed = 0;
+            YSpeed = 1;
+            Width = width;
+            Height = height;
         }
 
         public Cursor(Cursor previous)
@@ -51,7 +53,7 @@
         }
 
         public void Up(int speed = 1)
-            => (XSpeed, YSpeed) = (0, speed);
+            => (XSpeed, YSpeed) = (0, -speed);
 
         public void Down(int speed = 1)
             => Up(-speed);
@@ -80,7 +82,6 @@
         public Cursor GetSteppedCursor()
         {
             var next = new Cursor(this);
-            next.Step();
             return next;
         }
     }

@@ -230,7 +230,7 @@ namespace aheuIDA.Tests
 우멍섩멍섪멍섫어
 아바쌊반쌌받싸우
 희멍섮멍섰멍서어";
-            AssertAheui("320320320320320320320320320\n", code);
+            AssertAheui("320320320320320320320320320", code);
         }
 
         [TestMethod, TestCategory("Standard")]
@@ -410,13 +410,13 @@ namespace aheuIDA.Tests
 
         private void AssertAheui(string expected, string code, string arg)
         {
-            var intargs = arg.Cast<int>().ToArray();
+            var intargs = arg.Select(c => (int)c).ToArray();
             AssertAheui(expected, code, intargs);
         }
 
         private void AssertAheui(string expected, int exitcode, string code, string arg)
         {
-            var intargs = arg.Cast<int>().ToArray();
+            var intargs = arg.Select(c => (int)c).ToArray();
             AssertAheui(expected, exitcode, code, intargs);
         }
     }
