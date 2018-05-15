@@ -1,4 +1,6 @@
 # aheuIDA
+[![Build](https://img.shields.io/appveyor/ci/phillyai/AheuIDA/master.svg)](https://ci.appveyor.com/project/phillyai/AheuIDA)
+[![Tests](https://img.shields.io/appveyor/tests/phillyai/AheuIDA/master.svg)](https://ci.appveyor.com/project/phillyai/AheuIDA/build/tests)
 
 ![aheuida](/img/aheuida.png)
 
