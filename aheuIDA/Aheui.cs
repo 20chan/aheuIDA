@@ -25,8 +25,8 @@ namespace aheuIDA
         public int Width { get; }
         public int Height { get; }
 
-        private readonly Storage<T> _storage;
-        private Cursor _cursor;
+        protected readonly Storage<T> _storage;
+        protected Cursor _cursor;
 
         public Hangul CurrentCode => _code[_cursor.Y, _cursor.X];
         
@@ -92,7 +92,7 @@ namespace aheuIDA
                 Step();
         }
 
-        public void Step()
+        public virtual void Step()
         {
             var next = GetNextCursor();
 

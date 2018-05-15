@@ -13,8 +13,8 @@ namespace aheuIDA
         private StorageComparer<T> _bigeq, _eq;
         private StorageTFromInt<T> _inttot;
 
-        private readonly Dictionary<char, Stack<T>> _stacks;
-        private List<T> _queue;
+        internal readonly Dictionary<char, Stack<T>> _stacks;
+        internal List<T> _queue;
 
         public Storage(
             StorageFunction<T> add,
