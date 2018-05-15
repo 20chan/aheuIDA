@@ -282,7 +282,8 @@ namespace aheuIDA.Tests
             var code = @"ㅏ희ㅣ😄ㅓ
 뱓ㅗㅈㅊ몽
 ㅂ😃먕버헥";
-            AssertAheui("3", code);
+            IntAheui.Execute(code, out var output, true);
+            Assert.AreEqual("3", output);
         }
 
         [TestMethod, TestCategory("Standard")]

@@ -5,7 +5,7 @@ namespace aheuIDA
 {
     public class IntAheui : Aheui<int>
     {
-        public IntAheui(string code) : base(code)
+        public IntAheui(string code, bool utf32included = false) : base(code, utf32included)
         {
 
         }
@@ -18,10 +18,13 @@ namespace aheuIDA
         /// <param name="args">Arguments</param>
         /// <returns>Exit code</returns>
         public static int Execute(string code, out string output, params int[] args)
+            => Execute(code, out output, false, args);
+
+        public static int Execute(string code, out string output, bool utf32included, params int[] args)
         {
             var res = new StringBuilder();
             var queue = new Queue<int>(args);
-            var aheui = new IntAheui(code);
+            var aheui = new IntAheui(code, utf32included);
             aheui.NeedInput += (num) => queue.Dequeue();
             aheui.NeedOutput += (val, num) =>
             {

@@ -30,19 +30,25 @@ namespace aheuIDA
 
         public Hangul CurrentCode => _code[_cursor.Y, _cursor.X];
         
-        public Aheui(string code)
+        public Aheui(string code, bool utf32included = false)
         {
             OriginalCode = code;
-            _code = SeparateCode(code, out var width, out var height);
+            _code = SeparateCode(code, out var width, out var height, utf32included);
             Width = width;
             Height = height;
             _storage = new Storage<T>(Add, Sub, Mul, Div, Mod, IsEqual, IsBiggerOrEqual, IntToT);
             _cursor = new Cursor(Width, Height);
         }
 
-        private static Hangul[,] SeparateCode(string code, out int width, out int height)
+        private static Hangul[,] SeparateCode(string code, out int width, out int height, bool utf32Included = false)
         {
             var lines = code.Replace("\r\n", "\n").Split('\n');
+
+            if (utf32Included)
+            {
+                lines = lines.Select(s => ReplaceUtf32(s)).ToArray();
+            }
+
             height = lines.Length;
             width = lines.Max(s => s.Length);
 
@@ -58,6 +64,26 @@ namespace aheuIDA
                 }
             }
             return board;
+        }
+
+        protected static string ReplaceUtf32(string original)
+        {
+            var newone = new char[original.Length];
+            int i = 0;
+            int length = original.Length;
+            for (int w = 0; w < original.Length; w++)
+            {
+                var unicodeCP = char.ConvertToUtf32(original, w);
+                if (unicodeCP > 0xffff)
+                {
+                    length--;
+                    w++;
+                    newone[i++] = ' ';
+                }
+                else
+                    newone[i++] = original[w];
+            }
+            return new string(newone, 0, length);
         }
 
         public void RunAll()
