@@ -29,7 +29,7 @@
             (Choseong, Jungseong, Jongseong) = (choseong, jungseong, jongseong);
         }
 
-        private static char CombineLetter(char cho, char jung, char jong)
+        public static char CombineLetter(char cho, char jung, char jong)
         {
             int a, b, c;
             a = Choseongs.IndexOf(cho);
@@ -39,10 +39,10 @@
             return (char)('가' + (a * 21 + b) * 28 + c);
         }
 
-        private static bool IsKorean(char letter)
+        public static bool IsKorean(char letter)
             => '가' <= letter && letter <= '힇';
 
-        private static (char cho, char jung, char jong) SeparateLetter(char letter)
+        public static (char cho, char jung, char jong) SeparateLetter(char letter)
         {
             int a, b, c;
             if (IsKorean(letter))

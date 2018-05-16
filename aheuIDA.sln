@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aheuIDA.Tests", "aheuIDA.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aheuIDA", "aheuIDA\aheuIDA.csproj", "{EAD970F5-AAAB-4380-B61D-39973AAD58C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aheuIDA.GUI", "aheuIDA.GUI\aheuIDA.GUI.csproj", "{66091126-89E0-4FDE-8C2E-3F802BDD70D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EAD970F5-AAAB-4380-B61D-39973AAD58C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAD970F5-AAAB-4380-B61D-39973AAD58C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAD970F5-AAAB-4380-B61D-39973AAD58C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66091126-89E0-4FDE-8C2E-3F802BDD70D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66091126-89E0-4FDE-8C2E-3F802BDD70D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66091126-89E0-4FDE-8C2E-3F802BDD70D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66091126-89E0-4FDE-8C2E-3F802BDD70D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

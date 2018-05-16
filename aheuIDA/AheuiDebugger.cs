@@ -17,6 +17,8 @@ namespace aheuIDA
         public int XSpeed => _cursor.XSpeed;
         public int YSpeed => _cursor.YSpeed;
 
+        public char CurrentStorage => _storage.CurrentStorage;
+
         public event Action Break;
 
         public AheuiDebugger(string code, bool utf32included = false) : base(code, utf32included)
